@@ -1,0 +1,23 @@
+defmodule LogParser do
+  def valid_line?(line) do
+    line =~ ~r/^\[(ERROR|DEBUG|INFO|WARNING)\]/
+  end
+
+  def split_line(line) do
+    String.split(line, ~r/<[-=~\*]*>/)
+  end
+
+  def remove_artifacts(line) do
+    String.replace(line, ~r/end-of-line[0-9]+/i, "")
+  end
+
+  def tag_with_user_name(line) do
+    res = Regex.run(~r/user\s+([^\s]+)/i, line)
+    if res == nil do
+      line
+    else
+      user = Enum.at(res, 1)
+      "[USER] #{user} #{line}"
+    end
+  end
+end
